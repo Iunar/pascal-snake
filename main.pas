@@ -1,5 +1,8 @@
 { Ideas }
 {
+	Skybox
+	Restart
+	Main menu
 	Change camera position to improve readability
 	Store highscores
 	Highscore names
@@ -19,7 +22,7 @@
 
 program pascal_snake;
 
-{ 
+{
 	$MODE objfpc  Compiler mode for adding oop (vomit) 
 	a ansistring is a heap allocated, null-terminated string, that is reference counted.
 	a shortstring is a stack allocated string whose first byte represents the length of the string.
@@ -31,15 +34,15 @@ program pascal_snake;
 		In other words, a cstring.
 	Useful link for string sizes: https://www.freepascal.org/docs-html/3.2.0/ref/refsu13.html.
 }
-{$MODE fpc} { Tell the compiler to switch to the FPC(default) mode }
-{$UNITPATH raylib} { Tell the compiler to include the raylib directroy when searching for units (this shit rocks) }
-{$LIBRARYPATH raylib} { Tell the compiler to include the raylib directory when searching for libraries (this shit rocks) }
+{$MODE fpc} 			{ Tell the compiler to switch to the FPC(default) mode }
+{$UNITPATH raylib} 		{ Tell the compiler to include the raylib directroy when searching for units (this shit rocks) }
+{$LIBRARYPATH raylib} 	{ Tell the compiler to include the raylib directory when searching for libraries (this shit rocks) }
 
 uses cmem, raylib, math, Sysutils;
 
 const
 	GREY_PURPLE: 					TColor = (r: 32; g: 30; b: 33; a: 255);
-	LIGHT_GREEN: 					TColor = (r: 176; g: 237; b: 71; a: 255);
+	{ LIGHT_GREEN: 					TColor = (r: 176; g: 237; b: 71; a: 255); }
 	main_frame_buffer_width: 		integer = 320;
 	main_frame_buffer_height: 		integer = 240;
 	main_frame_buffer_render_scale: real = 3.25;
@@ -59,9 +62,9 @@ var
 	snake_move_interval_s:			real = 0.25;
 	grid_size:						integer = 16;
 	snake_movement_timer_start:		real = 0.0;
-	BLACK0:							TColor;
+	{ BLACK0:							TColor; }
 	PURPLE0:						TColor;
-	PURPLE1:						TColor;
+	{ PURPLE1:						TColor; }
 	GREEN0:							TColor;
 	GREEN1:							TColor;
 
@@ -88,7 +91,7 @@ begin
 			0, 48, 20, WHITE
 		);
 		DrawText(
-			PChar(Format('Score: %d', [score])), 0, 64, 20, YELLOW
+			PChar(Format('Score: %d', [score])), 0, 62, 20, YELLOW
 		);
 		DrawText(
 			PChar(Format('snake: <%n, %n, %n>', [snake[0].x, snake[0].y, snake[0].z])), 
@@ -101,6 +104,10 @@ begin
 		DrawText(
 			PChar(Format('snake_end: %d', [snake_end])),
 			0, 126, 20, RED
+		);
+		DrawText(
+			PChar(Format('Snake move interval: %n', [snake_move_interval_s])),
+			0, 150, 20, BLUE
 		);
 
 	EndDrawing();
@@ -160,9 +167,9 @@ begin
 	snake_end := snake_end + 1;
 	snake_movement_timer_start := GetTime();
 
-	BLACK0	 := hex_to_tcolor($070109ff);
+	{ BLACK0	 := hex_to_tcolor($070109ff); }
 	PURPLE0	 := hex_to_tcolor($14081aff);
-	PURPLE1	 := hex_to_tcolor($1e182eff);
+	{ PURPLE1	 := hex_to_tcolor($1e182eff); }
 	GREEN0	 := hex_to_tcolor($4b974fff);
 	GREEN1	 := hex_to_tcolor($91b95bff);
 
@@ -223,6 +230,13 @@ begin
 		if (snake[0].x = apple.x) and (snake[0].z = apple.z) then
 		begin
 			score := score + score_step;
+
+			if score mod 100 = 0 then
+				snake_move_interval_s := snake_move_interval_s - 0.05;
+
+			if snake_move_interval_s < 0.10 then 
+				snake_move_interval_s := 0.10;
+
 			snake[snake_end] := snake[snake_end - 1];
 			snake_end := snake_end + 1;
 
