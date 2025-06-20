@@ -39,7 +39,7 @@ uses cmem, raylib, math, Sysutils;
 
 const
 	GREY_PURPLE: 					TColor = (r: 32; g: 30; b: 33; a: 255);
-	LIGHT_GREEN: 					TColor = (r: 176; g: 237; b: 71; a: 255;);
+	LIGHT_GREEN: 					TColor = (r: 176; g: 237; b: 71; a: 255);
 	main_frame_buffer_width: 		integer = 320;
 	main_frame_buffer_height: 		integer = 240;
 	main_frame_buffer_render_scale: real = 3.25;
@@ -58,7 +58,12 @@ var
 	snake_vector:					TVector2;
 	snake_move_interval_s:			real = 0.25;
 	grid_size:						integer = 16;
-	snake_movement_timer_start:					real = 0.0;
+	snake_movement_timer_start:		real = 0.0;
+	BLACK0:							TColor;
+	PURPLE0:						TColor;
+	PURPLE1:						TColor;
+	GREEN0:							TColor;
+	GREEN1:							TColor;
 
 procedure display_main_frame_buffer;
 begin
@@ -124,6 +129,11 @@ begin
 	end;
 end;
 
+function hex_to_tcolor(color: longword): TColor;
+begin
+	hex_to_tcolor := ColorCreate(byte(color >> 24), byte(color >> 16), byte(color >> 8), byte(color));
+end;
+
 begin
 	InitWindow(
 		Trunc(main_frame_buffer_width * main_frame_buffer_render_scale),
@@ -149,6 +159,12 @@ begin
 	snake[snake_end] := Vector3Create(7.5, -0.5, 7.5);
 	snake_end := snake_end + 1;
 	snake_movement_timer_start := GetTime();
+
+	BLACK0	 := hex_to_tcolor($070109ff);
+	PURPLE0	 := hex_to_tcolor($14081aff);
+	PURPLE1	 := hex_to_tcolor($1e182eff);
+	GREEN0	 := hex_to_tcolor($4b974fff);
+	GREEN1	 := hex_to_tcolor($91b95bff);
 
 	while running do
 	begin
@@ -203,14 +219,12 @@ begin
 			snake_movement_timer_start := GetTime();
 		end;
 
-
 		{ Apple Update }
 		if (snake[0].x = apple.x) and (snake[0].z = apple.z) then
 		begin
 			score := score + score_step;
 			snake[snake_end] := snake[snake_end - 1];
 			snake_end := snake_end + 1;
-			{ apple := Vector3Create(7.5 - Random(grid_size), 0, 7.5 - Random(grid_size)); }
 
 			{ Prevent apple from spawning inside the snake's body }
 			i := 0;
@@ -227,17 +241,18 @@ begin
 			end;
 		end;
 
+		{ Render to the downscaled frame buffer }
 		BeginTextureMode(main_frame_buffer);
 			BeginMode3D(camera);
-				ClearBackground(GREY_PURPLE);
+				ClearBackground(PURPLE0);
 				DrawCube(apple, 1, 1, 1, RED);
 				DrawGrid(16, 1);
 				for i := 0 to snake_end - 1 do 
 				begin
 					if i mod 2 = 0 then
-						DrawCube(snake[i], 1, 1, 1, LIGHT_GREEN)
+						DrawCube(snake[i], 1, 1, 1, GREEN1)
 					else
-						DrawCube(snake[i], 1, 1, 1, GREEN);
+						DrawCube(snake[i], 1, 1, 1, GREEN0);
 				end;
 			EndMode3D();
 		EndTextureMode();
