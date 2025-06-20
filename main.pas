@@ -16,7 +16,7 @@
 	+--+ +--+ +--+
 }
 
-program snake3d;
+program pascal_snake;
 
 { 
 	$MODE objfpc  Compiler mode for adding oop (vomit) 
