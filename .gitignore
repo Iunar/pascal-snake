@@ -1,0 +1,6 @@
+*.dll
+raylib/
+*.o
+*.swp
+*.exe
+*.a
