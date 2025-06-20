@@ -1,5 +1,6 @@
 { Ideas }
 {
+	Change camera position to improve readability
 	Store highscores
 	Highscore names
 	3D snake (3D grid)
@@ -58,16 +59,6 @@ var
 	snake_move_interval_s:			real = 0.25;
 	grid_size:						integer = 16;
 	snake_movement_timer_start:					real = 0.0;
-
-procedure initialize_camera(var camera: TCamera3D);
-begin
-	camera := Default(TCamera3D);
-	camera.Fovy := 45;
-	camera.Up := Vector3Create(0, 1, 0);
-	camera.Position := Vector3Create(0, -15, -15);
-	camera.Target := Vector3Create(0, 0, 0);
-	camera.Projection := CAMERA_PERSPECTIVE;
-end;
 
 procedure display_main_frame_buffer;
 begin
@@ -153,7 +144,7 @@ begin
 
 	{ Initialize variables }
 	score_max := grid_size * grid_size;
-	apple := Vector3Create(7.5 - Random(grid_size), 0, 7.5 - Random(grid_size));
+	apple := Vector3Create(7.5 - Random(grid_size), -0.5, 7.5 - Random(grid_size));
 	setLength(snake, grid_size * grid_size);
 	snake[snake_end] := Vector3Create(7.5, -0.5, 7.5);
 	snake_end := snake_end + 1;
@@ -214,24 +205,32 @@ begin
 
 
 		{ Apple Update }
-		{ Note: i think the apple can still spawn inside the snake's body }
 		if (snake[0].x = apple.x) and (snake[0].z = apple.z) then
 		begin
 			score := score + score_step;
 			snake[snake_end] := snake[snake_end - 1];
 			snake_end := snake_end + 1;
-			apple := Vector3Create(7.5 - Random(grid_size), 0, 7.5 - Random(grid_size));
-			for i := 0 to snake_end - 1 do
+			{ apple := Vector3Create(7.5 - Random(grid_size), 0, 7.5 - Random(grid_size)); }
+
+			{ Prevent apple from spawning inside the snake's body }
+			i := 0;
+			while true do
 			begin
+				if i >= snake_end then break;
 				if (snake[i].x = apple.x) and (snake[i].z = apple.z) then
-					apple := Vector3Create(7.5 - Random(grid_size), 0.1, 7.5 - Random(grid_size));
+				begin
+					apple := Vector3Create(7.5 - Random(grid_size), -0.5, 7.5 - Random(grid_size));
+					i := 0;
+				end
+				else 
+					i := i + 1;
 			end;
 		end;
 
 		BeginTextureMode(main_frame_buffer);
 			BeginMode3D(camera);
 				ClearBackground(GREY_PURPLE);
-				DrawCube(apple, 1, 0, 1, RED);
+				DrawCube(apple, 1, 1, 1, RED);
 				DrawGrid(16, 1);
 				for i := 0 to snake_end - 1 do 
 				begin
